@@ -6,20 +6,23 @@ use App\Http\Controllers\VolunteerController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// تفعيل Auth بدون تسجيل مستخدمين جدد
+// تفعيل نظام المصادقة (Story #11)
 Auth::routes(['register' => false]);
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/home', function () {
-        return view('home');
-    })->name('home');
+    
+    // صفحة الهوم للمتطوع (Story #11)
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+    // إدارة المتطوعين (Story #1 & #2)
     Route::resource('volunteers', VolunteerController::class);
+    
     Route::resource('locations', LocationController::class);
     Route::resource('tasks', TaskController::class);
     
