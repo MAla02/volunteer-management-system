@@ -29,6 +29,7 @@ public function index()
     /**
      * Store a newly created resource in storage.
      */
+    // This method handles manual volunteer entry (Story #1)
     public function store(Request $request)
     {
         Volunteer::create($request->validate([
