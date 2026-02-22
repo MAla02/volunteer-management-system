@@ -4,89 +4,98 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Volunteer;
-
-
+use App\Models\User; // إضافة موديل المستخدم
+use Illuminate\Support\Facades\Hash; // إضافة مكتبة التشفير
 
 class VolunteerController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * عرض قائمة المتطوعين مع ميزة البحث والترقيم (Story #1)
      */
-public function index()
-{
-    $volunteers = Volunteer::all();
-    return view('volunteers.index', compact('volunteers'));
-}
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $volunteers = Volunteer::when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+        })->latest()->paginate(10); 
 
+        return view('volunteers.index', compact('volunteers'));
+    }
 
     /**
-     * Show the form for creating a new resource.
+     * عرض نموذج إضافة متطوع جديد
      */
     public function create()
     {
-        return view('volunteers.create');    }
+        return view('volunteers.create');
+    }
 
     /**
-     * Store a newly created resource in storage.
+     * تخزين متطوع جديد وإنشاء حساب مستخدم تلقائياً (Story #2)
      */
     public function store(Request $request)
     {
-        Volunteer::create($request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:volunteers',
+        // 1. التحقق من البيانات (التأكد من أن الإيميل فريد في الجدولين)
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:volunteers|unique:users',
             'phone' => 'required'
-        ]));
-        return redirect()->route('volunteers.index');
+        ]);
+
+        // 2. إنشاء سجل المتطوع
+        Volunteer::create($validatedData);
+
+        // 3. إنشاء حساب دخول تلقائي للمتطوع (Story #2)
+        User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make('12345678'), // كلمة مرور افتراضية كما هو متفق عليه
+            'role'     => 'volunteer', // تحديد الدور
+        ]);
+
+        return redirect()->route('volunteers.index')
+                         ->with('success', 'Volunteer added and account created successfully!');
     }
 
     /**
-     * Display the specified resource.
+     * عرض نموذج التعديل
      */
-    public function show(string $id)
+    public function edit(string $id)
     {
-        //
+        $volunteer = Volunteer::findOrFail($id);
+        return view('volunteers.edit', compact('volunteer'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * تحديث بيانات المتطوع
      */
-  public function edit(string $id)
-{
-    $volunteer = Volunteer::findOrFail($id);
-    return view('volunteers.edit', compact('volunteer'));  
-}
+    public function update(Request $request, string $id)
+    {
+        $volunteer = Volunteer::findOrFail($id);
 
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:volunteers,email,' . $volunteer->id,
+            'phone' => 'required',
+        ]);
+
+        $volunteer->update($validatedData);
+
+        return redirect()->route('volunteers.index')
+                         ->with('success', 'Volunteer updated successfully!');
+    }
 
     /**
-     * Update the specified resource in storage.
+     * حذف متطوع
      */
-public function update(Request $request, string $id)
-{
-    $volunteer = Volunteer::findOrFail($id);
+    public function destroy(string $id)
+    {
+        $volunteer = Volunteer::findOrFail($id);
+        $volunteer->delete();
 
-    $validatedData = $request->validate([
-        'name' => 'required',
-        'email' => 'required|email',
-        // 'email' => 'required|email|unique:volunteers,email,' . $volunteer->id,
-        'phone' => 'required',
-    ]);
-
-    $volunteer->update($validatedData);
-
-    return redirect()->route('volunteers.index')->with('success', 'Volunteer updated successfully!');
-}
-
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-public function destroy(string $id)
-{
-    $volunteer = Volunteer::findOrFail($id);  
-    $volunteer->delete();                   
-    
-    return redirect()->route('volunteers.index')->with('success', 'Volunteer deleted successfully!');
-}
-
+        return redirect()->route('volunteers.index')
+                         ->with('success', 'Volunteer deleted successfully!');
+    }
 }
