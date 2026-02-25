@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
-<div class="container">
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+            <div class="card shadow-sm border-0" style="border-radius: 15px;">
+                <div class="card-header  bg-primary text-white fw-bold"style="border-radius: 15px 15px 0 0;">{{ __('Login') }}</div>
 
                 <div class="card-body">
                         <form method="POST" action="{{ route('login') }}" autocomplete="off">
@@ -45,13 +45,13 @@
 
 
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                       
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary fw-bold" style="border-radius: 8px;">
                                     {{ __('Login') }}
                                 </button>
 
-                            </div>
+                           
                         </div>
                     </form>
                 </div>

@@ -1,7 +1,20 @@
 @extends('layouts.app')
 @section('content')
-<div class="container">
-    <h2>Assign Volunteer</h2>
+
+<div class="container  mt-5">
+    <h2 class="mb-4">Assign Volunteer</h2>
+
+   {{-- لعرض الاخطاء--}}
+     @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('assignments.store') }}">
         @csrf
         <div class="mb-3">
@@ -34,6 +47,13 @@
             </select>
         </div>
 
+           {{-- اضافة حقل--}}
+
+         <div class="mb-3">
+            <label for="assigned_date" class="form-label">Assignment Date</label>
+            <input type="date" name="assigned_date" id="assigned_date" class="form-control" required value="{{ date('Y-m-d') }}">
+        </div>
+           {{-- زر الارسال --}}
         <button type="submit" class="btn btn-success">Assign</button>
     </form>
 </div>

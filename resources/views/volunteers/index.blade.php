@@ -1,17 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mt-5">
 
     @if(session('success'))
-        <div class="alert alert-success">
+        <div class="alert alert-success  alert-dismissible fade show" role="alert">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     <h2>Volunteers List</h2>
     <a href="{{ route('volunteers.create') }}" class="btn btn-primary mb-3">Add New Volunteer</a>
 
+     <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -39,7 +41,10 @@
             @endforeach
         </tbody>
     </table>
+
 </div>
+</div>
+
 @endsection
 
 

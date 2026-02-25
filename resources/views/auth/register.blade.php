@@ -1,11 +1,12 @@
-<!-- @extends('layouts.app')
+ @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container  mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+            <div class="card shadow-sm border-0" style="border-radius: 15px;">
+                <div class="card-header bg-primary text-white fw-bold" style="border-radius: 15px 15px 0 0;">
+                    {{ __('Register') }}</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('register') }}">
@@ -61,12 +62,12 @@
                             </div>
                         </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
+                      
+                            <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Register') }}
                                 </button>
-                            </div>
+                          
                         </div>
                     </form>
                 </div>
@@ -74,4 +75,4 @@
         </div>
     </div>
 </div>
-@endsection -->
+@endsection

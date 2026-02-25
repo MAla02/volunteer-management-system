@@ -1,14 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
+
+<div class="container mt-5">
+    <div class="row justify-content-center ">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Confirm Password') }}</div>
+
+            <div class="card shadow-sm border-0" style="border-radius: 15px;">
+                <div class="card-header bg-primary text-white fw-bold" style="border-radius: 15px 15px 0 0;">
+                      {{ __('Confirm Password') }}
+                    </div>
 
                 <div class="card-body">
-                    {{ __('Please confirm your password before continuing.') }}
+                    <p class="mb-4"> {{ __('Please confirm your password before continuing.') }} </p>
 
                     <form method="POST" action="{{ route('password.confirm') }}">
                         @csrf
@@ -27,23 +31,22 @@
                             </div>
                         </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                    
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-primary fw-bold" style="border-radius: 8px;">
                                     {{ __('Confirm Password') }}
                                 </button>
 
                                 @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
+                                    <a class="btn btn-link p-0" href="{{ route('password.request') }}">
                                         {{ __('Forgot Your Password?') }}
                                     </a>
                                 @endif
-                            </div>
+                            
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
     </div>
 </div>
 @endsection
