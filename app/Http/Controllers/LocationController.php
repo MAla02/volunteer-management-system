@@ -41,7 +41,7 @@ class LocationController extends Controller
 
         Location::create($validated);
 
-        return redirect()->route('locations.index')->with('success', 'تمت إضافة الموقع بنجاح!');
+        return redirect()->route('locations.index')->with('success', 'Location added successfully!');
     }
 
     /**
@@ -75,7 +75,7 @@ class LocationController extends Controller
 
         $location->update($validatedData);
 
-        return redirect()->route('locations.index')->with('success', 'تم تحديث الموقع بنجاح!');
+        return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
     }
 
     /**
@@ -86,6 +86,6 @@ class LocationController extends Controller
         $location = Location::findOrFail($id); 
         $location->delete(); 
 
-        return redirect()->route('locations.index')->with('success', 'تم حذف الموقع بنجاح!');
+        return redirect()->route('locations.index')->with('success', 'Location deleted successfully!');
     }
 }
