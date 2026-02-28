@@ -9,36 +9,58 @@ use App\Models\Assignment;
 
 class HomeController extends Controller
 {
-    /**
-     * التحقق من تسجيل الدخول (Story #16)
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * عرض المهام الشخصية للمتطوع (Story #12)
-     */
     public function index()
     {
         $user = Auth::user();
 
-        // الآدمن في السبرنت 3 قد يرى صفحة بسيطة أو يتم توجيهه للوحات التحكم الأخرى
+        // 1. منطق الأدمن: جلب كل التوزيعات ليعرضها في الصفحة الرئيسية (مثل الصورة التي أرفقتيها)
         if ($user->role === 'admin') {
-            return view('home'); 
+            $allAssignments = Assignment::with(['volunteer', 'location', 'task'])
+                                ->latest()
+                                ->paginate(10); // لجعل الواجهة غنية بالبيانات
+
+            return view('home', [
+                'isAdmin' => true,
+                'allAssignments' => $allAssignments
+            ]);
         }
 
-        // منطق السبرنت 3: جلب مهام المتطوع بناءً على إيميله
+        // 2. منطق المتطوع: جلب مهامه الشخصية
         $volunteer = Volunteer::where('email', $user->email)->first();
         $myTasks = collect(); 
 
         if ($volunteer) {
             $myTasks = Assignment::with(['location', 'task'])
                         ->where('volunteer_id', $volunteer->id)
+                        ->where('status', '!=', 'cancelled')
+                        ->latest()
                         ->get();
         }
 
-        return view('home', compact('myTasks'));
+        return view('home', [
+            'isAdmin' => false,
+            'myTasks' => $myTasks
+        ]);
+    }
+
+    public function completeTask($id)
+    {
+        $assignment = Assignment::findOrFail($id);
+
+        $volunteer = Volunteer::where('email', Auth::user()->email)->first();
+        if (!$volunteer || $assignment->volunteer_id !== $volunteer->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // تحديث الحالة
+        $assignment->status = 'completed';
+        $assignment->save();
+
+        return redirect()->route('home')->with('success', 'Great job! Task marked as completed. 🎉');
     }
 }
