@@ -3,16 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
-use App\Models\Task;
-use App\Models\Volunteer;
-use App\Models\Assignment;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     * تم تعديلها لتشمل البحث والترتيب والتقسيم لصفحات (Story #3)
+     * عرض قائمة المواقع مع البحث والتقسيم لصفحات
      */
     public function index(Request $request)
     {
@@ -26,7 +22,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * عرض نموذج إنشاء موقع جديد
      */
     public function create()
     {
@@ -34,8 +30,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     * تم تعديلها لإضافة شرط "unique" لمنع تكرار الأسماء (Story #3)
+     * تخزين الموقع الجديد في قاعدة البيانات
      */
     public function store(Request $request)
     {
@@ -50,7 +45,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * عرض بيانات موقع محدد (اختياري)
      */
     public function show(string $id)
     {
@@ -58,7 +53,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * عرض نموذج تعديل الموقع
      */
     public function edit(string $id)
     {
@@ -67,8 +62,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     * يفضل إضافة استثناء للمعالجة الحالية في الـ unique عند التحديث
+     * تحديث بيانات الموقع في قاعدة البيانات
      */
     public function update(Request $request, string $id)
     {
@@ -81,17 +75,17 @@ class LocationController extends Controller
 
         $location->update($validatedData);
 
-        return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
+        return redirect()->route('locations.index')->with('success', 'تم تحديث الموقع بنجاح!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * حذف الموقع من قاعدة البيانات
      */
     public function destroy(string $id)
     {
         $location = Location::findOrFail($id); 
         $location->delete(); 
 
-        return redirect()->route('locations.index')->with('success', 'Location deleted successfully!');
+        return redirect()->route('locations.index')->with('success', 'تم حذف الموقع بنجاح!');
     }
 }

@@ -1,21 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2 class="mb-4">Dashboard</h2>
-
-    @if (session('status'))
-        <div class="alert alert-success" role="alert">
-            {{ session('status') }}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            {{-- واجهة ترحيبية بسيطة فقط --}}
+            <div class="card shadow-sm border-0 p-5" style="border-radius: 20px;">
+                <div class="card-body">
+                    <h1 class="fw-bold text-dark mb-3">Welcome, {{ Auth::user()->name }}!</h1>
+                    <p class="text-muted fs-5">You are successfully logged in as <span class="badge bg-dark px-3">{{ ucfirst(Auth::user()->role) }}</span></p>
+                    
+                    <hr class="my-4 opacity-25">
+                    
+                    <p class="text-secondary">Please use the navigation menu to manage locations or tasks.</p>
+                </div>
+            </div>
         </div>
-    @endif
-
-    <div class="list-group">
-        <a href="{{ route('volunteers.index') }}" class="list-group-item list-group-item-action">Manage Volunteers</a>
-        <a href="{{ route('locations.index') }}" class="list-group-item list-group-item-action">Manage Work Locations</a>
-        <a href="{{ route('tasks.index') }}" class="list-group-item list-group-item-action">Manage Tasks</a>
-        <a href="{{ route('assignments.index') }}" class="list-group-item list-group-item-action">Assign Volunteers</a>
     </div>
 </div>
 @endsection
-
