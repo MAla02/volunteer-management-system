@@ -3,47 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
-use App\Models\Task;
-use App\Models\Volunteer;
-use App\Models\Assignment;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * عرض قائمة المواقع مع البحث والتقسيم لصفحات
      */
     public function index(Request $request)
-{
-    $search = $request->input('search');
-    $locations = Location::when($search, function ($query, $search) {
-        return $query->where('name', 'like', "%{$search}%");
-    })->latest()->paginate(10);
-
-    return view('locations.index', compact('locations'));
-}
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
     {
-        return view('locations.create');    }
+        $search = $request->input('search');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        Location::create($request->validate([
-            'name' => 'required|unique:locations,name',
-            'description' => 'nullable'
-        ]));
-        return redirect()->route('locations.index');
+        $locations = Location::when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%");
+        })->latest()->paginate(10); 
+
+        return view('locations.index', compact('locations'));
     }
 
     /**
-     * Display the specified resource.
+     * عرض نموذج إنشاء موقع جديد
+     */
+    public function create()
+    {
+        return view('locations.create');
+    }
+
+    /**
+     * تخزين الموقع الجديد في قاعدة البيانات
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|unique:locations,name|max:255', 
+            'description' => 'nullable'
+        ]);
+
+        Location::create($validated);
+
+        return redirect()->route('locations.index')->with('success', 'تمت إضافة الموقع بنجاح!');
+    }
+
+    /**
+     * عرض بيانات موقع محدد (اختياري)
      */
     public function show(string $id)
     {
@@ -51,47 +53,39 @@ class LocationController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * عرض نموذج تعديل الموقع
      */
-        
-        public function edit(string $id){
-            $location = Location::findOrFail($id); // اجلب السجل
-            return view('locations.edit', compact('location')); // ثم مرره للعرض
-
-        }
-        
-
-
-
+    public function edit(string $id)
+    {
+        $location = Location::findOrFail($id); 
+        return view('locations.edit', compact('location'));
+    }
 
     /**
-     * Update the specified resource in storage.
+     * تحديث بيانات الموقع في قاعدة البيانات
      */
-public function update(Request $request, string $id)
-{
-    $location = Location::findOrFail($id); // اجلب السجل أولاً
+    public function update(Request $request, string $id)
+    {
+        $location = Location::findOrFail($id);
 
-    $validatedData = $request->validate([
-        'name' => 'required',
-        'description' => 'nullable'
-    ]);
+        $validatedData = $request->validate([
+            'name' => 'required|max:255|unique:locations,name,' . $id,
+            'description' => 'nullable'
+        ]);
 
-    $location->update($validatedData);
+        $location->update($validatedData);
 
-    return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
-}
-
+        return redirect()->route('locations.index')->with('success', 'تم تحديث الموقع بنجاح!');
+    }
 
     /**
-     * Remove the specified resource from storage.
+     * حذف الموقع من قاعدة البيانات
      */
-public function destroy(string $id)
-{
-    $location = Location::findOrFail($id); // جلب الموقع باستخدام ID
-    $location->delete();                   // حذف الموقع
+    public function destroy(string $id)
+    {
+        $location = Location::findOrFail($id); 
+        $location->delete(); 
 
-    return redirect()->route('locations.index')->with('success', 'Location deleted successfully!');
-    
-}
-
+        return redirect()->route('locations.index')->with('success', 'تم حذف الموقع بنجاح!');
+    }
 }
