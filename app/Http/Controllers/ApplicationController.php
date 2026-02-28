@@ -43,20 +43,33 @@ class ApplicationController extends Controller
             'status'    => 'pending'
         ]);
 
-        return redirect()->back()->with('success', 'Your application has been submitted successfully! We will contact you soon');
+        return redirect()->back()->with('success', 'Your application has been submitted successfully!');
     }
 
-    public function index() {
-    // جلب الطلبات التي لم يتم التعامل معها فقط (حالتها انتظار)
-    $applications = Application::with('task')
-        ->where('status', 'pending') 
-        ->latest()
-        ->get();
+    /**
+     * تحديث السبرنت الرابعة: عرض الطلبات مع ميزة البحث المتقدم (شغل ملاك)
+     */
+    public function index(Request $request) {
+        $search = $request->input('search');
 
-    return view('admin.applications.index', compact('applications'));
-}
+        // جلب الطلبات مع القدرة على البحث بالاسم أو التخصص أو الإيميل
+        $applications = Application::with('task')
+            ->when($search, function($query, $search) {
+                return $query->where('full_name', 'like', "%{$search}%")
+                             ->orWhere('major', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10); // Paginate أفضل للأداء من get()
+
+        return view('admin.applications.index', compact('applications'));
+    }
 
     public function updateStatus(Request $request, $id) {
+        $request->validate([
+            'status' => 'required|in:pending,approved,rejected'
+        ]);
+
         $application = Application::findOrFail($id);
         $application->update(['status' => $request->status]);
 
@@ -65,33 +78,36 @@ class ApplicationController extends Controller
 
     public function myApplications() {
         if(Auth::check()){
-            $applications = Application::where('user_id', Auth::id())->with('task')->get();
+            // جلب طلبات المستخدم المسجل حالياً
+            $applications = Application::where('email', Auth::user()->email)
+                                     ->with('task')
+                                     ->get();
             return view('my_applications', compact('applications'));
         }
         return redirect()->route('login');
     }
 
-    // --- الدوال الجديدة التي كانت تنقصك (أضيفيها الآن) ---
+    // --- نظام تتبع حالة الطلب (بدون إرسال إيميل خارجي) ---
 
-    // 1. عرض صفحة إدخال الإيميل للتتبع
     public function showStatusForm() {
         return view('application_status_check');
     }
 
-    // 2. البحث عن الطلب وعرض حالته
     public function checkStatus(Request $request) {
         $request->validate([
             'email' => 'required|email'
         ]);
 
-        // نبحث عن آخر طلب قدمه هذا الشخص باستخدام الإيميل
-        $application = Application::where('email', $request->email)->with('task')->latest()->first();
+        // البحث عن الطلب لعرض حالته مباشرة في الصفحة (تتبع)
+        $application = Application::where('email', $request->email)
+                                    ->with('task')
+                                    ->latest()
+                                    ->first();
 
         if (!$application) {
             return redirect()->back()->with('error', 'No application found for this email address.');
         }
 
-        // نعود لنفس الصفحة ومعنا بيانات الطلب لعرضها
         return view('application_status_check', compact('application'));
     }
 }
