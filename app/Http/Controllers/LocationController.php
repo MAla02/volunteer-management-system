@@ -13,9 +13,15 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return view('locations.index', ['locations' => Location::all()]);    }
+    public function index(Request $request)
+{
+    $search = $request->input('search');
+    $locations = Location::when($search, function ($query, $search) {
+        return $query->where('name', 'like', "%{$search}%");
+    })->latest()->paginate(10);
+
+    return view('locations.index', compact('locations'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -30,7 +36,7 @@ class LocationController extends Controller
     public function store(Request $request)
     {
         Location::create($request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:locations,name',
             'description' => 'nullable'
         ]));
         return redirect()->route('locations.index');
