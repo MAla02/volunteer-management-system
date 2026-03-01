@@ -28,7 +28,8 @@
 
                             <input type="text" name="name" value="{{ $task->name }}" class="form-control border-secondary-subtle"
 
-                                   style="border-radius: 8px; color: black;" required>
+                                   style="border-radius: 8px; color: black;" >
+                                   
 
                         </div>
 
@@ -37,13 +38,8 @@
 
 
                         <div class="mb-4">
-
-                            <label class="form-label fw-bold text-black">Description</label>
-
-                            <textarea name="description" class="form-control border-secondary-subtle" rows="4"
-
-                                      style="border-radius: 8px; color: black;" required>{{ $task->description }}</textarea>
-
+                        <label class="form-label fw-bold text-black">Description</label>
+                        <textarea name="description" class="form-control" rows="4">{{ $task->description }}</textarea>
                         </div>
 
 
