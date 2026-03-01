@@ -19,7 +19,7 @@ class VolunteerController extends Controller
         $volunteers = Volunteer::when($search, function ($query, $search) {
             return $query->where('name', 'like', "%{$search}%")
                          ->orWhere('email', 'like', "%{$search}%");
-        })->latest()->paginate(10); 
+        })->paginate(10); 
 
         return view('volunteers.index', compact('volunteers'));
     }
