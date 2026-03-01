@@ -4,6 +4,7 @@
 <div class="container">
 
     {{-- تنبيه النجاح التقليدي قمنا بتحسينه في الملف الرئيسي، لكن سأتركه هنا لضمان عدم ضياع أي رسالة --}}
+    {{-- تنبيه النجاح التقليدي قمنا بتحسينه في الملف الرئيسي، لكن سأتركه هنا لضمان عدم ضياع أي رسالة --}}
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -62,8 +63,14 @@
                         
                         {{-- التعديل الاحترافي لزر الحذف --}}
                         <form action="{{ route('volunteers.destroy', $volunteer->id) }}" method="POST" style="display:inline;" id="delete-form-{{ $volunteer->id }}">
+                        
+                        {{-- التعديل الاحترافي لزر الحذف --}}
+                        <form action="{{ route('volunteers.destroy', $volunteer->id) }}" method="POST" style="display:inline;" id="delete-form-{{ $volunteer->id }}">
                             @csrf
                             @method('DELETE')
+                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $volunteer->id }})">
+                                Delete
+                            </button>
                             <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $volunteer->id }})">
                                 Delete
                             </button>
