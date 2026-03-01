@@ -75,27 +75,32 @@ class HomeController extends Controller
     /**
      * دالة تحديث بيانات المتطوع الشخصية (رقم الهاتف وكلمة المرور)
      */
-    public function updateProfile(Request $request)
-    {
-        $user = Auth::user();
+    /**
+     * دالة تحديث بيانات المتطوع الشخصية (رقم الهاتف وكلمة المرور)
+     */
+   public function updateProfile(Request $request)
+{
+    $user = Auth::user();
 
-        $request->validate([
-            'phone' => 'required|string|max:20',
-            'password' => 'nullable|min:8|confirmed', 
-        ]);
+    // 1. التحقق: جعلنا كل شيء اختياري (Sometimes) عشان لو عدلتي واحد الثاني ما يضرب
+    $request->validate([
+        'phone'    => 'sometimes|nullable|string|max:20',
+        'password' => 'sometimes|nullable|min:8', 
+    ]);
 
-        // تحديث رقم الهاتف
+    // 2. تحديث الهاتف "فقط" إذا تم إرساله في الفورم وليس فارغاً
+    if ($request->filled('phone')) {
         Volunteer::where('email', $user->email)->update([
             'phone' => $request->phone
         ]);
-
-        // تحديث كلمة المرور إذا وجدت
-        if ($request->filled('password')) {
-            $user->update([
-                'password' => Hash::make($request->password)
-            ]);
-        }
-
-        return redirect()->route('home')->with('status', 'Your profile information has been updated! ✅');
     }
+
+    // 3. تحديث الباسورد "فقط" إذا تم إرساله وليس فارغاً
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+        $user->save();
+    }
+
+    return redirect()->route('home')->with('status', 'Profile updated successfully! ✅');
+}
 }
