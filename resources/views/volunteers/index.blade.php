@@ -15,10 +15,7 @@
         <a href="{{ route('volunteers.create') }}" class="btn btn-primary">Add New Volunteer</a>
     </div>
 
-<<<<<<< Updated upstream
-=======
     {{-- قسم البحث --}}
->>>>>>> Stashed changes
     <div class="card mb-4">
         <div class="card-body">
             <form action="{{ url()->current() }}" method="GET" class="row g-2">
@@ -37,11 +34,8 @@
             </form>
         </div>
     </div>
-<<<<<<< Updated upstream
-=======
 
     {{-- جدول المتطوعين --}}
->>>>>>> Stashed changes
     <table class="table table-striped border">
         <thead class="table-light">
             <tr>
@@ -82,8 +76,6 @@
         {{ $volunteers->appends(['search' => request('search')])->links() }}
     </div>
 </div>
-<<<<<<< Updated upstream
-=======
 @endsection
 
 {{-- السكريبت الخاص بالنافذة الجمالية --}}
@@ -107,5 +99,4 @@ function confirmDelete(id) {
     })
 }
 </script>
->>>>>>> Stashed changes
 @endsection
