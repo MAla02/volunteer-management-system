@@ -46,7 +46,7 @@
                                 </li>
                                 {{-- الرابط الجديد الذي سأضيفه لكِ هنا --}}
                                 <li class="nav-item">
-                                <a class="nav-link fw-bold text-primary" href="{{ route('admin.applications.index') }}">
+                                <a class="nav-link" href="{{ route('admin.applications.index') }}">
                                 Applications
                                  </a>
                                  </li>
