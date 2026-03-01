@@ -50,20 +50,25 @@ class ApplicationController extends Controller
      * تحديث السبرنت الرابعة: عرض الطلبات مع ميزة البحث المتقدم (شغل ملاك)
      */
     public function index(Request $request) {
-        $search = $request->input('search');
+    $search = $request->input('search');
 
-        // جلب الطلبات مع القدرة على البحث بالاسم أو التخصص أو الإيميل
-        $applications = Application::with('task')
-            ->when($search, function($query, $search) {
-                return $query->where('full_name', 'like', "%{$search}%")
-                             ->orWhere('major', 'like', "%{$search}%")
-                             ->orWhere('email', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(10); // Paginate أفضل للأداء من get()
+    $applications = Application::with('task')
+        ->when($search, function($query, $search) {
+            // التصحيح هنا: وضعنا كل شروط الـ or داخل مجموعة واحدة لضمان دقة البحث
+            return $query->where(function($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                  ->orWhere('major', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('task', function($taskQuery) use ($search) {
+                      $taskQuery->where('name', 'like', "%{$search}%");
+                  }); // تم إغلاق قوس الدالة هنا بشكل صحيح
+            });
+        })
+        ->latest()
+        ->paginate(10);
 
-        return view('admin.applications.index', compact('applications'));
-    }
+    return view('admin.applications.index', compact('applications'));
+}
 
     public function updateStatus(Request $request, $id) {
         $request->validate([
