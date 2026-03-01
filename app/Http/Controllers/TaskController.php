@@ -67,15 +67,16 @@ public function update(Request $request, string $id)
     $task = Task::findOrFail($id); 
 
     $validated = $request->validate([
-        'name' => 'required|max:255|unique:tasks,name,',
-        'description' => 'nullable'
+        // بنسمح بتعديل الاسم لحال (مع تجاهل الـ ID الحالي)
+        'name' => 'required|max:255|unique:tasks,name,' . $id,
+        // بنخلي الوصف اختياري عشان ما يطلب تعبئته لو ما بدك تغيريه
+        'description' => 'nullable' 
     ]);
 
     $task->update($validated);
 
-    return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
+    return redirect()->route('tasks.index')->with('success', 'Task updated successfully! ✅');
 }
-
 
     /**
      * Remove the specified resource from storage.
