@@ -11,21 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::create('assignments', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->foreignId('volunteer_id')->constrained()->onDelete('cascade');
-        //     $table->foreignId('location_id')->constrained()->onDelete('cascade');
-        //     $table->foreignId('task_id')->constrained()->onDelete('cascade');
-        //     $table->timestamps();
-
-        // });
-    Schema::create('assignments', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('volunteer_id')->constrained()->onDelete('cascade');
-    $table->foreignId('location_id')->constrained()->onDelete('cascade');
-    $table->foreignId('task_id')->constrained()->onDelete('cascade');
-    $table->timestamps();
-});
+        Schema::create('assignments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('volunteer_id')->constrained()->onDelete('cascade');
+            $table->foreignId('location_id')->constrained()->onDelete('cascade');
+            $table->foreignId('task_id')->constrained()->onDelete('cascade');
+            
+            // إضافة الحقل المسبب للمشكلة
+            $table->date('assigned_date'); 
+            
+            // إضافة حقل الحالة ليعمل النظام بشكل صحيح
+            $table->string('status')->default('pending'); 
+            
+            $table->timestamps();
+        });
     }
 
     /**

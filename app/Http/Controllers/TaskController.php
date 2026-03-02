@@ -12,9 +12,16 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return view('tasks.index', ['tasks' => Task::all()]);    }
+    public function index(Request $request)
+{
+    $search = $request->input('search');
+    $tasks = Task::when($search, function ($query, $search) {
+        return $query->where('name', 'like', "%{$search}%")
+                     ->orWhere('description', 'like', "%{$search}%");
+    })->latest()->paginate(10);
+
+    return view('tasks.index', compact('tasks'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -29,10 +36,10 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         Task::create($request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:tasks,name|max:255',
             'description' => 'nullable'
         ]));
-        return redirect()->route('tasks.index');
+        return redirect()->route('tasks.index')->with('success', 'Task Added successfully!');
     }
 
     /**
@@ -60,15 +67,16 @@ public function update(Request $request, string $id)
     $task = Task::findOrFail($id); 
 
     $validated = $request->validate([
-        'name' => 'required',
-        'description' => 'nullable'
+        // بنسمح بتعديل الاسم لحال (مع تجاهل الـ ID الحالي)
+        'name' => 'required|max:255|unique:tasks,name,' . $id,
+        // بنخلي الوصف اختياري عشان ما يطلب تعبئته لو ما بدك تغيريه
+        'description' => 'nullable' 
     ]);
 
     $task->update($validated);
 
-    return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
+    return redirect()->route('tasks.index')->with('success', 'Task updated successfully! ✅');
 }
-
 
     /**
      * Remove the specified resource from storage.

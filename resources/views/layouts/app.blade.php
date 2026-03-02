@@ -4,16 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-    <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
@@ -28,24 +25,41 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                <ul class="navbar-nav me-auto">
-                   @auth
-                      <li class="nav-item">
-                           <a class="nav-link" href="{{ route('volunteers.index') }}">Volunteers</a>
-                       </li>
-                   <li class="nav-item">
-                     <a class="nav-link" href="{{ route('locations.index') }}">Work Locations</a>
-                   </li>
-                  <li class="nav-item">
-                     <a class="nav-link" href="{{ route('tasks.index') }}">Tasks</a>
-                  </li>
-                  <li class="nav-item">
-                       <a class="nav-link" href="{{ route('assignments.index') }}">Assignments</a>
-                      </li>
-                    @endauth
-                     </ul>
+                    <ul class="navbar-nav me-auto">
+                        @auth
+                            {{-- القائمة العلوية للأدمن - محدثة --}}
+                            @if(Auth::user()->role === 'admin')
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('volunteers.index') }}">Volunteers</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('locations.index') }}">Work Locations</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('tasks.index') }}">Tasks</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('assignments.index') }}">Assignments</a>
+                                </li>
+                                {{-- الرابط الجديد الذي سأضيفه لكِ هنا --}}
+                                <li class="nav-item">
+                                <a class="nav-link" href="{{ route('admin.applications.index') }}">
+                                Applications
+                                 </a>
+                                 </li>
+                            @endif
 
+                            {{-- إذا كان المستخدم متطوع: يظهر له خيار الإعدادات فقط --}}
+                            @if(Auth::user()->role === 'volunteer')
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">My Settings</a>
+                                </li>
+                            @endif
+                        @endauth
+                    </ul>
 
                     <ul class="navbar-nav ms-auto">
                         @guest
@@ -54,8 +68,6 @@
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>
                             @endif
-
-
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -84,6 +96,8 @@
             @yield('content')
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    @yield('scripts')
 </body>
 </html>
-

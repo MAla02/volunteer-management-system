@@ -12,9 +12,15 @@ class VolunteerController extends Controller
     /**
      * Display a listing of the resource.
      */
-public function index()
-{
-    $volunteers = Volunteer::all();
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $volunteers = Volunteer::when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+        })->paginate(10); 
+
     return view('volunteers.index', compact('volunteers'));
 }
 
@@ -30,14 +36,28 @@ public function index()
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        Volunteer::create($request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:volunteers',
-            'phone' => 'required'
-        ]));
-        return redirect()->route('volunteers.index');
-    }
+{
+    // 1. التحقق من البيانات (تأكدي من صحة الإيميل وأنه غير مكرر في الجدولين)
+    $validatedData = $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:volunteers|unique:users',
+        'phone' => 'required'
+    ]);
+
+    // 2. إنشاء المتطوع في جدول volunteers
+    Volunteer::create($validatedData);
+
+    // 3. إنشاء حساب دخول (User) في جدول users بنفس البيانات
+    \App\Models\User::create([
+        'name'     => $request->name,
+        'email'    => $request->email,
+        'password' => \Illuminate\Support\Facades\Hash::make('12345678'), // كلمة المرور الافتراضية
+        'role'     => 'volunteer', // تحديد الدور تلقائياً كمتطوع
+    ]);
+
+    // 4. التوجه لصفحة القائمة مع رسالة نجاح
+    return redirect()->route('volunteers.index')->with('success', 'Volunteer created and login account generated!');
+}
 
     /**
      * Display the specified resource.

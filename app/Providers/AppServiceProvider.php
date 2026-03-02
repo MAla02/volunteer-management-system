@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+// 1. استدعاء مكتبة الترقيم - ضروري جداً
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // 2. تفعيل Bootstrap لترقيم الصفحات ليعمل بشكل صحيح مع تصميمك
+        Paginator::useBootstrapFive();
     }
 }
